@@ -289,6 +289,11 @@ int delete(int removekey,int prevpos,struct BTreeNode* prevnode,struct BTreeNode
                         marge(currentnode,i);
                         delete(removekey,i,NULL,currentnode);
                     }
+                } else if(prevnode==NULL && currentnode->child[0]==NULL){
+                    currentnode->count--;
+                    shifttoleft(i,currentnode);
+                    currentnode->keys[currentnode->count] = NULL;
+                    return 0;
                 }
             } else if (removekey < currentnode->keys[i]) {
                 prevnode = currentnode;
@@ -297,6 +302,18 @@ int delete(int removekey,int prevpos,struct BTreeNode* prevnode,struct BTreeNode
             }
         }
         return 0;
+    }
+}
+void traversal(struct BTreeNode *myNode) {
+    int i;
+    if (myNode) {
+
+        for (i = 0; i < myNode->count; i++) {
+            traversal(myNode->child[i]);
+            printf("%d ", myNode->keys[i]);
+        }
+
+        traversal(myNode->child[i]);
     }
 }
 int main() {
@@ -312,64 +329,73 @@ int main() {
 //            check_num_of_key(root);
 //        }
 //    }
-    insert(100);
-    insert(67);
-    insert(96);
-    insert(32);
-    insert(45);
-    insert(88);
-    insert(102);
-    insert(64);
-    insert(99);
-    insert(87);
-    insert(56);
-    insert(300);
-    insert(43);
-    insert(89);
-    insert(90);
-    insert(20);
-    insert(60);
-    insert(57);
-    insert(62);
-    insert(76);
-    insert(77);
-    insert(95);
-    insert(97);
-    insert(98);
-    insert(250);
-    insert(9);
-    insert(5);
-    insert(2);
-    insert(150);
-    insert(1);
-    insert(75);
-    insert(65);
-    insert(55);
-    insert(34);
-    insert(0);
-    insert(400);
-    insert(10);
-    insert(74);
-    insert(91);//39
-    delete(0,0, NULL, root);
-    delete(32,0, NULL, root);
-    delete(34,0, NULL, root);
-//    while (true){
-//        int option;
-//        printf("enter 1 to insert data\nenter 2 to delete data\n");
-//        scanf("%d",&option);
-//        switch(option){
-//            int key;
-//            case 1:
-//                printf("enter data to insert");
-//                scanf("%d",&key);
-//                insert(key);
-//            case 2:
-//                printf("enter data to delete");
-//                scanf("%d",&key);
-//                delete(key,0,NULL,root);
-//        }
-//    }
+//    insert(100);
+//    insert(67);
+//    insert(96);
+//    insert(32);
+//    insert(45);
+//    insert(88);
+//    insert(102);
+//    insert(64);
+//    insert(99);
+//    insert(87);
+//    insert(56);
+//    insert(300);
+//    insert(43);
+//    insert(89);
+//    insert(90);
+//    insert(20);
+//    insert(60);
+//    insert(57);
+//    insert(62);
+//    insert(76);
+//    insert(77);
+//    insert(95);
+//    insert(97);
+//    insert(98);
+//    insert(250);
+//    insert(9);
+//    insert(5);
+//    insert(2);
+//    insert(150);
+//    insert(1);
+//    insert(75);
+//    insert(65);
+//    insert(55);
+//    insert(34);
+//    insert(0);
+//    insert(400);
+//    insert(10);
+//    insert(74);
+//    insert(91);//39
+//    delete(100,0, NULL, root);
+//    delete(32,0, NULL, root);
+//    //delete(34,0, NULL, root);
+//    delete(20,0, NULL, root);
+
+
+    while (true){
+        int option;
+        int key;
+        printf("Enter your option\n1. insert data\n2. to delete data\n");
+        scanf("%d",&option);
+        switch(option){
+            case 1:
+                printf("enter data to insert=>");
+                scanf("%d",&key);
+                insert(key);
+                traversal(root);
+                printf("\n");
+                break;
+            case 2:
+                printf("enter data to delete=>");
+                scanf("%d",&key);
+                delete(key,0,NULL,root);
+                traversal(root);
+                printf("\n");
+                break;
+        }
+    }
 }
 
 /*
