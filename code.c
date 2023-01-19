@@ -385,30 +385,30 @@ int main() {
     //root and one child(that may have child)-d
     //pure leaf-d-(check prev->count)
     //pure internal node||
-    insert(20);
-    insert(60);
-    insert(57);
-    insert(62);
-    insert(76);
-    insert(77);
-    insert(95);
-    insert(97);
-    insert(98);
-    insert(250);
-    insert(9);
-    insert(5);
-    insert(2);
-    insert(150);
-    insert(1);
-    insert(75);
-    insert(65);
-    insert(55);
-    insert(34);
-    insert(0);
-    insert(400);
-    insert(10);
-    insert(74);
-    insert(91);//39
+//     insert(20);
+//     insert(60);
+//     insert(57);
+//     insert(62);
+//     insert(76);
+//     insert(77);
+//     insert(95);
+//     insert(97);
+//     insert(98);
+//     insert(250);
+//     insert(9);
+//     insert(5);
+//     insert(2);
+//     insert(150);
+//     insert(1);
+//     insert(75);
+//     insert(65);
+//     insert(55);
+//     insert(34);
+//     insert(0);
+//     insert(400);
+//     insert(10);
+//     insert(74);
+//     insert(91);//39
     delete(100,0, NULL, root);
 
 
