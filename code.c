@@ -2,6 +2,16 @@
 #include "stdbool.h"
 #include "stdlib.h"
 #include "time.h"
+//internal node->count 1 phit tae condition
+//pure internal node kphit tae condition
+//prevnode != NULL && currentnode->leaf
+//prev->count ko pyan check yan
+
+
+//to test root only
+        //root and one child(that may have child)
+        //pure leaf
+        //pure internal node
 #define MAX 5
 #define MIN 2
 struct BTreeNode{
@@ -241,59 +251,86 @@ struct BTreeNode* search(int search_key,struct BTreeNode* node){
         }
     }
 }
+
 int delete(int removekey,int prevpos,struct BTreeNode* prevnode,struct BTreeNode* currentnode) {
     if (currentnode == NULL) {
         return 0;
     }
     if (removekey > currentnode->keys[currentnode->count - 1] && currentnode->child[0] != NULL) {
         prevnode = currentnode;
-        delete(removekey,currentnode->count, prevnode, currentnode->child[MAX]);
+        delete(removekey,currentnode->count, prevnode, currentnode->child[currentnode->count]);
         return 0;
     } else {
         int index = currentnode->count;
         for (int i = 0; i < index; i++) {
             if (removekey == currentnode->keys[i]) {//equal yin tan phyat p mha sorting pyan loat
-                if (prevnode != NULL && currentnode->leaf && currentnode->count > MIN) {
+                if(prevnode==NULL && currentnode->child[0]==NULL){//root only
                     currentnode->count--;
                     shifttoleft(i,currentnode);
                     currentnode->keys[currentnode->count] = NULL;
                     return 0;
-                } else if (prevnode != NULL && currentnode->leaf && currentnode->count <= MIN) {
-                    if (i > 0 && prevnode->child[i - 1]->count > MIN) {
-                        swapkey_left_to_right(prevnode, i + 1, i);
-                        shifttoright(i, currentnode);
-                        currentnode->count--;
+                } else if(prevnode==NULL && currentnode->child[0]!=NULL){//root nae child(child yae aout mhr child twy shi oo mhr)
+                    if(currentnode->child[i]->count>MIN){
+                        currentnode->keys[i]=currentnode->child[i]->keys[currentnode->child[i]->count-1];
+                        currentnode->child[i]->keys[currentnode->child[i]->count-1]=NULL;
+                        currentnode->child[i]->count--;
                         return 0;
-                    } else if (prevnode->child[i + 1]->count > MIN) {
-                        swapkey_right_to_left(prevnode, i, i + 1);
-                        shifttoleft(0, currentnode);
-                        currentnode->count--;
+                    } else if(currentnode->child[i+1]->count>MIN){
+                        currentnode->keys[i]=currentnode->child[i+1]->keys[currentnode->child[i+1]->count-1];
+                        currentnode->child[i+1]->count--;
                         return 0;
-                    } else if (prevpos!=0) {
-                        marge(prevnode,prevpos-1);
-                        delete(removekey,prevpos,NULL,prevnode);
-                    } else {
-                        marge(prevnode,prevpos);
-                        delete(removekey,prevpos,NULL,prevnode);
+                    } else{
+                        if (prevpos!=0) {
+                            marge(prevnode,prevpos-1);
+                            delete(removekey,prevpos,NULL,prevnode);
+                            return 0;
+                        } else {
+                            marge(prevnode,prevpos);
+                            delete(removekey,prevpos,NULL,prevnode);
+                            return 0;
+                        }
                     }
-                    return 0;
-                } else if(prevnode!=NULL && !currentnode->leaf){//pure internal node
+                } else if(prevnode!=NULL && currentnode->leaf){//pure leaf
+                    if ( currentnode->count > MIN) {
+                        currentnode->count--;
+                        shifttoleft(i,currentnode);
+                        currentnode->keys[currentnode->count] = NULL;
+                        return 0;
+                    } else if ( currentnode->count < MIN+1) {
+                        if (prevpos > 0 && prevnode->child[prevpos - 1]->count > MIN) {
+                            swapkey_left_to_right(prevnode, prevpos + 1, prevpos);
+                            shifttoright(i, currentnode);
+                            currentnode->count--;
+                            return 0;
+                        } else if (prevnode->child[prevpos + 1]->count > MIN) {
+                            swapkey_right_to_left(prevnode, prevpos, prevpos + 1);
+                            shifttoleft(0, currentnode);
+                            currentnode->count--;
+                            return 0;
+                        } else if (prevpos!=0) {
+                            marge(prevnode,prevpos-1);
+                            delete(removekey,prevpos,NULL,prevnode);
+                        } else {
+                            marge(prevnode,prevpos);
+                            delete(removekey,prevpos,NULL,prevnode);
+                        }
+                        return 0;
+                    }
+                }else if(prevnode!=NULL && !currentnode->leaf){//pure internal node//root yal child yal pal shi mal
                     if(currentnode->child[i-1]->count>MIN){
                         currentnode->keys[i]=currentnode->child[i-1]->keys[currentnode->child[i-1]->count-1];
                         currentnode->child[i-1]->count--;
+                        return 0;
                     }else if(currentnode->child[i+1]->count>MIN){
                         currentnode->keys[i]=currentnode->child[i+1]->keys[0];
                         shifttoleft(0,currentnode->child[i+1]);
                         currentnode->child[i+1]->count--;
+                        return 0;
                     } else{
                         marge(currentnode,i);
                         delete(removekey,i,NULL,currentnode);
+                        return 0;
                     }
-                } else if(prevnode==NULL && currentnode->child[0]==NULL){
-                    currentnode->count--;
-                    shifttoleft(i,currentnode);
-                    currentnode->keys[currentnode->count] = NULL;
-                    return 0;
                 }
             } else if (removekey < currentnode->keys[i]) {
                 prevnode = currentnode;
@@ -329,73 +366,74 @@ int main() {
 //            check_num_of_key(root);
 //        }
 //    }
-//    insert(100);
-//    insert(67);
-//    insert(96);
-//    insert(32);
-//    insert(45);
-//    insert(88);
-//    insert(102);
-//    insert(64);
-//    insert(99);
-//    insert(87);
-//    insert(56);
-//    insert(300);
-//    insert(43);
-//    insert(89);
-//    insert(90);
-//    insert(20);
-//    insert(60);
-//    insert(57);
-//    insert(62);
-//    insert(76);
-//    insert(77);
-//    insert(95);
-//    insert(97);
-//    insert(98);
-//    insert(250);
-//    insert(9);
-//    insert(5);
-//    insert(2);
-//    insert(150);
-//    insert(1);
-//    insert(75);
-//    insert(65);
-//    insert(55);
-//    insert(34);
-//    insert(0);
-//    insert(400);
-//    insert(10);
-//    insert(74);
-//    insert(91);//39
-//    delete(100,0, NULL, root);
-//    delete(32,0, NULL, root);
-//    //delete(34,0, NULL, root);
-//    delete(20,0, NULL, root);
+    insert(100);
+    insert(67);
+    insert(96);
+    insert(32);
+    insert(45);
+    insert(88);
+    insert(102);
+    insert(64);
+    insert(99);
+    insert(87);
+    insert(56);
+    insert(300);
+    insert(43);
+    insert(89);
+    insert(90);
+    //to test root only-d
+    //root and one child(that may have child)-d
+    //pure leaf-d-(check prev->count)
+    //pure internal node||
+    insert(20);
+    insert(60);
+    insert(57);
+    insert(62);
+    insert(76);
+    insert(77);
+    insert(95);
+    insert(97);
+    insert(98);
+    insert(250);
+    insert(9);
+    insert(5);
+    insert(2);
+    insert(150);
+    insert(1);
+    insert(75);
+    insert(65);
+    insert(55);
+    insert(34);
+    insert(0);
+    insert(400);
+    insert(10);
+    insert(74);
+    insert(91);//39
+    delete(100,0, NULL, root);
 
 
-    while (true){
-        int option;
-        int key;
-        printf("Enter your option\n1. insert data\n2. to delete data\n");
-        scanf("%d",&option);
-        switch(option){
-            case 1:
-                printf("enter data to insert=>");
-                scanf("%d",&key);
-                insert(key);
-                traversal(root);
-                printf("\n");
-                break;
-            case 2:
-                printf("enter data to delete=>");
-                scanf("%d",&key);
-                delete(key,0,NULL,root);
-                traversal(root);
-                printf("\n");
-                break;
-        }
-    }
+//    while (true){
+//        int option;
+//        int key;
+//        printf("Enter your option\n1. insert data\n2. to delete data\n");
+//        scanf("%d",&option);
+//        switch(option){
+//            case 1:
+//                printf("enter data to insert=>");
+//                scanf("%d",&key);
+//                insert(key);
+//                traversal(root);
+//                printf("\n");
+//                break;
+//            case 2:
+//                printf("enter data to delete=>");
+//                scanf("%d",&key);
+//                delete(key,0,NULL,root);
+//                traversal(root);
+//                printf("\n");
+//                break;
+//        }
+//    }
 }
 
 /*
